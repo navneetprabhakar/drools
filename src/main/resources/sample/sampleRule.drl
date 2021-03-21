@@ -1,0 +1,65 @@
+package sample;
+
+import com.navneet.drools.models.DroolsRequest;
+import com.navneet.drools.models.DroolsResponse;
+import org.springframework.util.CollectionUtils;
+import com.navneet.drools.models.DroolsRequest.DataSet;
+
+rule "Calculate Total"
+	salience 99
+	activation-group "Rule 1"
+
+	when
+		$response: DroolsResponse();
+		$request: DroolsRequest(null!=marksheet);
+	then
+		Integer sum=0;
+		Integer total=0;
+		for(DataSet ele:$request.getMarksheet()){
+			sum+=ele.getMarks();
+			total+=ele.getTotalMarks();
+		}
+		$response.setMarksObtained(sum);
+		$response.setTotal(total);
+end
+
+rule "Calculate Percentage"
+	salience 99
+	activation-group "Rule 2"
+
+	when
+		$response: DroolsResponse();
+		$request: DroolsRequest(null!=marksheet);
+	then
+		Double percentage=(($response.getMarksObtained() *1.0)/ ($response.getTotal()*1.0)) *100.0;
+		$response.setPercentage(percentage);
+end
+
+rule "Calculate Grade"
+	salience 99
+	activation-group "Rule 3"
+
+	when
+		$response: DroolsResponse();
+		$request: DroolsRequest(null!=marksheet);
+	then
+	    String grade="";
+	    if($response.getPercentage()>=90.0){
+        	grade="O";
+        }else if($response.getPercentage()>=80.0){
+		    grade="A";
+		}else if($response.getPercentage()>=70.0){
+		    grade="B";
+		}else if($response.getPercentage()>=60.0){
+            grade="C";
+        }else if($response.getPercentage()>=50.0){
+            grade="D";
+        }else if($response.getPercentage()>=40.0){
+            grade="E";
+        }else if($response.getPercentage()>=33.0){
+            grade="P";
+        }else{
+            grade="F";
+        }
+        $response.setGrade(grade);
+end
