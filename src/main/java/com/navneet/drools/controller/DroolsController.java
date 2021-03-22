@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * @author navneetprabhakar
+ * Sample Drools Rule controller
+ */
 @RestController
 @RequestMapping("v1/rules/")
 public class DroolsController {
@@ -17,6 +21,11 @@ public class DroolsController {
     private DroolsService droolsService;
 
 
+    /**
+     * This POST API calculates total marks, percentage and passing grade based on the input provided
+     * @param request
+     * @return
+     */
     @PostMapping("calculateResult")
     public DroolsResponse calculateResult(@RequestBody DroolsRequest request) {
         return droolsService.calcaulateResult(request);

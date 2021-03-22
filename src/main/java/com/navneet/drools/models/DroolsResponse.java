@@ -2,6 +2,9 @@ package com.navneet.drools.models;
 
 import lombok.Data;
 
+/**
+ * @author navneetprabhakar
+ */
 @Data
 public class DroolsResponse {
 

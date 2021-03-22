@@ -10,13 +10,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-
+/**
+ * @author navneetprabhakar
+ */
 @Service
 @Log4j2
 public class DroolsServiceImpl implements DroolsService {
     @Autowired
     private DroolsUtils droolsUtils;
 
+    /**
+     * This method calculates DroolsResponse based on the request and the rules written for that session
+     * @param request
+     * @return
+     */
     @Override
     public DroolsResponse calcaulateResult(DroolsRequest request) {
         log.info("initiating calculate result");
