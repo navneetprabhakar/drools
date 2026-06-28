@@ -1,36 +1,97 @@
-# Drools Implementation using Spring Boot
-This repository is implementation of Drools Rule engine with Spring Boot Application with a REST API to test the rules
+# Drools Rule Engine with Spring Boot
 
-# Introduction:
-Drools is a Business Rule Management System (BRMS) solution. It provides a rule engine which processes facts and produces output as a result of rules and facts processing. Centralization of business logic makes it possible to introduce changes fast and cheap.
+> A Spring Boot demo that exposes the Drools (KIE) rule engine through a REST API.
 
-It also bridges the gap between the Business and Technical teams by providing a facility for writing the rules in a format which is easy to understand.
+A small Spring Boot application that shows how to embed the Drools Business Rule Management System in a service and drive it over REST. The bundled example evaluates an academic marksheet: it sums marks, computes a percentage, and assigns a letter grade — all via business rules defined in a `.drl` file rather than Java code.
 
-# Approach
-1. Add maven dependecies for drools-core & kie-spring
-2. Add module xml file inside resources/META-INF called kmodule.xml
-3. Add drl file in resource/sample (folder path should be same as defined in kmodule.xml)
+## Features
 
-# API Description: 
-- METHOD: POST
-- URL: http://localhost:8080/Drools/v1/rules/calculateResult
-- Body: This is a Sample Request with 2 Subjects and score
+- Spring-managed `KieContainer` for executing Drools rules
+- Rules externalised in a `.drl` file under `src/main/resources`, wired up through `kmodule.xml`
+- A single REST endpoint that inserts request/response facts into a `KieSession` and fires the rules
+- Example marksheet ruleset that calculates total marks, percentage, and grade in sequential, activation-grouped rules
+
+## How It Works
+
+The example rules live in `src/main/resources/sample/sampleRule.drl` and are registered via `src/main/resources/META-INF/kmodule.xml` (knowledge base `sample`, session `sampleSession`). The ruleset runs three rules in order:
+
+1. **Calculate Total** — sums `marks` and `totalMarks` across all subjects
+2. **Calculate Percentage** — computes `(marksObtained / total) × 100`
+3. **Calculate Grade** — assigns a letter grade by percentage band (`O ≥ 90`, `A ≥ 80`, `B ≥ 70`, `C ≥ 60`, `D ≥ 50`, `E ≥ 40`, `P ≥ 33`, otherwise `F`)
+
+## Tech Stack
+
+- **Java 8**
+- **Spring Boot 4.1.0-M1**
+- **Drools Core 7.50.0.Final** + **KIE Spring 7.74.1.Final**
+- **Lombok**
+- **Maven** (with the Maven Wrapper)
+
+## Getting Started
+
+### Prerequisites
+
+- JDK 8+
+
+### Build
+
+```bash
+./mvnw clean package
+```
+
+### Run
+
+```bash
+./mvnw spring-boot:run
+```
+
+The service runs on `http://127.0.0.1:8080` under the context path `/Drools`.
+
+## Configuration
+
+Settings live in `src/main/resources/application.properties`:
+
+| Key | Value |
+| --- | --- |
+| `server.address` | `127.0.0.1` |
+| `server.port` | `8080` |
+| `server.servlet.context-path` | `/Drools` |
+
+## API
+
+### `POST /Drools/v1/rules/calculateResult`
+
+Evaluates a marksheet and returns the computed result.
+
+**Request body:**
 
 ```json
 {
-    "marksheet": [
-        {
-            "subject": "MATHS",
-            "marks": 80,
-            "totalMarks": 100
-        },
-        {
-            "subject": "SCIENCE",
-            "marks": 80,
-            "totalMarks": 100
-        }
-    ]
+  "marksheet": [
+    { "subject": "MATHS", "marks": 80, "totalMarks": 100 },
+    { "subject": "SCIENCE", "marks": 80, "totalMarks": 100 }
+  ]
 }
 ```
 
-Wiki Link: https://www.drools.org/
+**Response:**
+
+```json
+{
+  "grade": "A",
+  "marksObtained": 160,
+  "total": 200,
+  "percentage": 80.0
+}
+```
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `grade` | string | Letter grade (`O`/`A`/`B`/`C`/`D`/`E`/`P`/`F`) |
+| `marksObtained` | integer | Sum of `marks` across subjects |
+| `total` | integer | Sum of `totalMarks` across subjects |
+| `percentage` | double | Computed percentage |
+
+## Learn More
+
+- Drools project: https://www.drools.org/
